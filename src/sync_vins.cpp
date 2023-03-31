@@ -33,10 +33,10 @@ typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sens
 
 int N = 0;
 Eigen::VectorXd vins_pose(8), optitrack_pose(8), t265_pose(8);
-Eigen::VectorXd all_pose(24);
+Eigen::VectorXd all_pose(16);
 vector<Eigen::VectorXd> pose_vec;
 
-ofstream f_out("data/jiahao_test2.txt",ios::app);
+ofstream f_out("data/jiahao_test1.txt",ios::app);
 string basedir;
 int frame_n, n;
 cv::Mat rgb_img, depth_img;
@@ -87,7 +87,7 @@ void talker::registerNodeHandle(ros::NodeHandle& _nh){
 }
 void talker::registerPubSub(){
  
-  basedir = "data/jiahao_test2/";
+  basedir = "data/jiahao_test1/";
 
   // vins_sub = new message_filters::Subscriber<nav_msgs::Odometry>(nh, "/vins_fusion/odometry", 10); 
   optitrack_sub = new message_filters::Subscriber<geometry_msgs::PoseStamped>(nh, "/vrpn_client_node/jiahao_sun/pose", 10); 
@@ -162,13 +162,13 @@ void talker::cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs
 
   if (optitrack_pose.size() != 0){
     //  all_pose << vins_pose, optitrack_pose, t265_pose;
-     all_pose << vins_pose, optitrack_pose, t265_pose;
+     all_pose << optitrack_pose, t265_pose;
      cout << "all_pose size = " << all_pose.size() << endl;
      pose_vec.push_back(all_pose);
      cout << "pose_vec size = " << pose_vec.size() << endl;
      for (int i=0; i<all_pose.size()-1; i++ )
         f_out << all_pose(i) << " ";
-     f_out << all_pose(23) << endl;
+     f_out << all_pose(15) << endl;
   }
   //rgb,depth
   cv::imwrite(basedir + to_string(frame_n) + "_main.png",cv_bridge::toCvShare(rgb, "bgr8")->image);
