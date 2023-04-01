@@ -32,7 +32,7 @@ Eigen::VectorXd vins_pose(8), optitrack_pose(8), t265_pose(8);
 Eigen::VectorXd all_pose(24);
 vector<Eigen::VectorXd> pose_vec;
 
-ofstream f_out("data/pose_vec_jiahao_test1.txt",ios::app);
+ofstream f_out("data/jiahao_test1.txt",ios::app);
 ros::Time t0;
 string basedir;
 int frame_n, n;
@@ -61,7 +61,7 @@ void vinsCallback(const nav_msgs::Odometry::ConstPtr& vins)//指针
   double z = vins->pose.pose.orientation.z;
   double w = vins->pose.pose.orientation.w;
 
-  double t = (vins-> header.stamp-t0 ).toSec();
+  double t = (ros::Time::now()-t0 ).toSec();
   cout << "t = " << t << endl;
 
   vins_pose << t,px,py,pz,x,y,z,w;
@@ -90,7 +90,7 @@ void optitrackCallback(const geometry_msgs::PoseStamped::ConstPtr& optitrack)//�
   double z = optitrack->pose.orientation.z;
   double w = optitrack->pose.orientation.w;
 
-  double t = (optitrack-> header.stamp-t0).toSec();
+  double t = (ros::Time::now()-t0).toSec();
 
   optitrack_pose << t,px,py,pz,x,y,z,w;
 
@@ -109,7 +109,7 @@ void t265Callback(const nav_msgs::Odometry::ConstPtr& t265)//指针
   double z = t265->pose.pose.orientation.z;
   double w = t265->pose.pose.orientation.w;
 
-  double t = (t265-> header.stamp-t0 ).toSec();
+  double t = (ros::Time::now()-t0 ).toSec();
   cout << "t = " << t << endl;
 
   t265_pose << t,px,py,pz,x,y,z,w;
