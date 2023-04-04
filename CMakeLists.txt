@@ -148,6 +148,11 @@ add_executable(trans_node src/sync_vins.cpp)
 target_link_libraries(trans_node ${catkin_LIBRARIES})
 target_link_libraries(trans_node ${OpenCV_LIBRARIES})
 target_link_libraries(trans_node pthread)
+
+add_executable(trans_node_for_error src/sync_vins_t265_error.cpp)
+target_link_libraries(trans_node_for_error ${catkin_LIBRARIES})
+target_link_libraries(trans_node_for_error ${OpenCV_LIBRARIES})
+target_link_libraries(trans_node_for_error pthread)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
