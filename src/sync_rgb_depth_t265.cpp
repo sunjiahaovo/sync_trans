@@ -29,11 +29,11 @@ using namespace std;
 // typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image,
 //  nav_msgs::Odometry, geometry_msgs::PoseStamped, nav_msgs::Odometry>  mySyncPolicy;
 typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image,
-  geometry_msgs::PoseStamped, nav_msgs::Odometry>  mySyncPolicy;
+   nav_msgs::Odometry>  mySyncPolicy;
 
 int N = 0;
-Eigen::VectorXd vins_pose(8), optitrack_pose(8), t265_pose(8);
-Eigen::VectorXd all_pose(16);
+Eigen::VectorXd t265_pose(8);
+Eigen::VectorXd all_pose(8);
 vector<Eigen::VectorXd> pose_vec;
 
 ofstream f_out("data/jiahao_flight1.txt",ios::app);
@@ -65,14 +65,14 @@ class talker{
       // void cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs::ImageConstPtr depth,
       //  const nav_msgs::Odometry::ConstPtr vins,  const geometry_msgs::PoseStampedConstPtr optitrack,  const nav_msgs::Odometry::ConstPtr t265);
       void cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs::ImageConstPtr depth,
-        const geometry_msgs::PoseStampedConstPtr optitrack,  const nav_msgs::Odometry::ConstPtr t265);
+          const nav_msgs::Odometry::ConstPtr t265);
       
     private:
       // ros::Subscriber  vins_sub, optitrack_sub, t265_sub;  
       message_filters::Subscriber<sensor_msgs::Image>* rgb_sub;             // topic1 input
       message_filters::Subscriber<sensor_msgs::Image>* depth_sub;           // topic2 input
       // message_filters::Subscriber<nav_msgs::Odometry>* vins_sub;
-      message_filters::Subscriber<geometry_msgs::PoseStamped>* optitrack_sub;
+      // message_filters::Subscriber<geometry_msgs::PoseStamped>* optitrack_sub;
       message_filters::Subscriber<nav_msgs::Odometry>* t265_sub;
       message_filters::Synchronizer<mySyncPolicy>* sync; 
       ros::Time t0 = ros::Time::now();
@@ -90,21 +90,21 @@ void talker::registerPubSub(){
   basedir = "data/jiahao_flight1/";
 
   // vins_sub = new message_filters::Subscriber<nav_msgs::Odometry>(nh, "/vins_fusion/odometry", 10); 
-  optitrack_sub = new message_filters::Subscriber<geometry_msgs::PoseStamped>(nh, "/vrpn_client_node/jiahao_sun/pose", 10); 
+  // optitrack_sub = new message_filters::Subscriber<geometry_msgs::PoseStamped>(nh, "/vrpn_client_node/jiahao_sun/pose", 10); 
   t265_sub = new message_filters::Subscriber<nav_msgs::Odometry>(nh, "/cam_2/odom/sample", 10); 
   rgb_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh, "/camera/color/image_raw", 10);
   depth_sub  = new message_filters::Subscriber<sensor_msgs::Image>(nh, "/camera/aligned_depth_to_color/image_raw", 10);
   // sync = new  message_filters::Synchronizer<mySyncPolicy>(mySyncPolicy(10), *rgb_sub, *depth_sub, *vins_sub, *optitrack_sub, *t265_sub);
   // sync->registerCallback(boost::bind(&talker::cd_callback,this, _1, _2, _3, _4, _5));
-  sync = new  message_filters::Synchronizer<mySyncPolicy>(mySyncPolicy(10), *rgb_sub, *depth_sub, *optitrack_sub, *t265_sub);
-  sync->registerCallback(boost::bind(&talker::cd_callback,this, _1, _2, _3, _4));
+  sync = new  message_filters::Synchronizer<mySyncPolicy>(mySyncPolicy(10), *rgb_sub, *depth_sub, *t265_sub);
+  sync->registerCallback(boost::bind(&talker::cd_callback,this, _1, _2, _3));
 }
 
 
 // void talker::cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs::ImageConstPtr depth, 
 //                         const nav_msgs::Odometry::ConstPtr vins,  const geometry_msgs::PoseStampedConstPtr optitrack,  const nav_msgs::Odometry::ConstPtr t265)
 
-void talker::cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs::ImageConstPtr depth, const geometry_msgs::PoseStampedConstPtr optitrack,  const nav_msgs::Odometry::ConstPtr t265) 
+void talker::cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs::ImageConstPtr depth,  const nav_msgs::Odometry::ConstPtr t265) 
 {
   cout<<"come in"<<endl;
   //vins
@@ -133,42 +133,42 @@ void talker::cd_callback(const sensor_msgs::ImageConstPtr rgb, const sensor_msgs
 
   // t = (optitrack-> header.stamp-t0).toSec();
 
-  double px = optitrack->pose.position.x;
-  double py = optitrack->pose.position.y;
-  double pz = optitrack->pose.position.z;
-  double x = optitrack->pose.orientation.x;
-  double y = optitrack->pose.orientation.y;
-  double z = optitrack->pose.orientation.z;
-  double w = optitrack->pose.orientation.w;
+  // double px = optitrack->pose.position.x;
+  // double py = optitrack->pose.position.y;
+  // double pz = optitrack->pose.position.z;
+  // double x = optitrack->pose.orientation.x;
+  // double y = optitrack->pose.orientation.y;
+  // double z = optitrack->pose.orientation.z;
+  // double w = optitrack->pose.orientation.w;
 
-  double t = (optitrack-> header.stamp-t0).toSec();
+  // double t = (optitrack-> header.stamp-t0).toSec();
 
-  optitrack_pose << t,px,py,pz,x,y,z,w;
+  // optitrack_pose << t,px,py,pz,x,y,z,w;
 
   //t265
-  px = t265->pose.pose.position.x;
-  py = t265->pose.pose.position.y;
-  pz = t265->pose.pose.position.z;
-  x = t265->pose.pose.orientation.x;
-  y = t265->pose.pose.orientation.y;
-  z = t265->pose.pose.orientation.z;
-  w = t265->pose.pose.orientation.w;
+  double px = t265->pose.pose.position.x;
+  double py = t265->pose.pose.position.y;
+  double pz = t265->pose.pose.position.z;
+  double x = t265->pose.pose.orientation.x;
+  double y = t265->pose.pose.orientation.y;
+  double z = t265->pose.pose.orientation.z;
+  double w = t265->pose.pose.orientation.w;
 
-  t = (t265-> header.stamp-t0 ).toSec();
+  double t = (ros::Time::now()-t0 ).toSec();
   cout << "t = " << t << endl;
 
   t265_pose << t,px,py,pz,x,y,z,w;
 
 
-  if (optitrack_pose.size() != 0){
+  if (t265_pose.size() != 0){
     //  all_pose << vins_pose, optitrack_pose, t265_pose;
-     all_pose << optitrack_pose, t265_pose;
+     all_pose << t265_pose;
      cout << "all_pose size = " << all_pose.size() << endl;
      pose_vec.push_back(all_pose);
      cout << "pose_vec size = " << pose_vec.size() << endl;
      for (int i=0; i<all_pose.size()-1; i++ )
         f_out << all_pose(i) << " ";
-     f_out << all_pose(15) << endl;
+     f_out << all_pose(7) << endl;
   }
   //rgb,depth
   cv::imwrite(basedir + to_string(frame_n) + "_main.png",cv_bridge::toCvShare(rgb, "bgr8")->image);
