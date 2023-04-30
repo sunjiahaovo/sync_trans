@@ -36,7 +36,7 @@ Eigen::VectorXd t265_pose(8);
 Eigen::VectorXd all_pose(8);
 vector<Eigen::VectorXd> pose_vec;
 
-ofstream f_out("data/jiahao_flight1.txt",ios::app);
+ofstream f_out("data/jiahao_L5151.txt",ios::app);
 string basedir;
 int frame_n, n;
 cv::Mat rgb_img, depth_img;
@@ -87,16 +87,16 @@ void talker::registerNodeHandle(ros::NodeHandle& _nh){
 }
 void talker::registerPubSub(){
  
-  basedir = "data/jiahao_flight1/";
+  basedir = "data/jiahao_L5151/";
 
   // vins_sub = new message_filters::Subscriber<nav_msgs::Odometry>(nh, "/vins_fusion/odometry", 10); 
   // optitrack_sub = new message_filters::Subscriber<geometry_msgs::PoseStamped>(nh, "/vrpn_client_node/jiahao_sun/pose", 10); 
-  t265_sub = new message_filters::Subscriber<nav_msgs::Odometry>(nh, "/cam_2/odom/sample", 10); 
-  rgb_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh, "/camera/color/image_raw", 10);
-  depth_sub  = new message_filters::Subscriber<sensor_msgs::Image>(nh, "/camera/aligned_depth_to_color/image_raw", 10);
+  t265_sub = new message_filters::Subscriber<nav_msgs::Odometry>(nh, "/cam_2/odom/sample", 60); 
+  rgb_sub = new message_filters::Subscriber<sensor_msgs::Image>(nh, "/camera/color/image_raw", 60);
+  depth_sub  = new message_filters::Subscriber<sensor_msgs::Image>(nh, "/camera/aligned_depth_to_color/image_raw", 60);
   // sync = new  message_filters::Synchronizer<mySyncPolicy>(mySyncPolicy(10), *rgb_sub, *depth_sub, *vins_sub, *optitrack_sub, *t265_sub);
   // sync->registerCallback(boost::bind(&talker::cd_callback,this, _1, _2, _3, _4, _5));
-  sync = new  message_filters::Synchronizer<mySyncPolicy>(mySyncPolicy(10), *rgb_sub, *depth_sub, *t265_sub);
+  sync = new  message_filters::Synchronizer<mySyncPolicy>(mySyncPolicy(60), *rgb_sub, *depth_sub, *t265_sub);
   sync->registerCallback(boost::bind(&talker::cd_callback,this, _1, _2, _3));
 }
 
